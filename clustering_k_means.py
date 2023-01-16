@@ -95,7 +95,7 @@ def generate_plot(dataset, trace_time=False, max_clusters=10):
     plt.show()
 
 
-models = ["xclara", "cassini", "birch-rg1", "3-spiral"]
+models = ["xclara", "cassini", "3-spiral"]
 
 for dataset in models:
     print(dataset)

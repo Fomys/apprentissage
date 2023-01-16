@@ -85,12 +85,14 @@ def generate_plot(dataset, trace_time=False, max_clusters=10):
     db_all = []
     ch_all = []
     s_all = []
-    for eps in arange(0.01, 0.21, 0.05):
+    x = arange(0.01, 0.21, 0.05)
+    y = arange(2, 102, 10)
+    for eps in x:
         db = []
         ch = []
         s = []
         print(eps)
-        for min_samples in range(1, 101, 10):
+        for min_samples in y:
             db_s, ch_s, s_s = compute(dataset, datanp, eps, min_samples, trace_time=trace_time)
             db.append(db_s)
             ch.append(ch_s)
@@ -103,23 +105,39 @@ def generate_plot(dataset, trace_time=False, max_clusters=10):
     im = plt.imshow(db_all, cmap='hot', interpolation='nearest')
     cbar = ax.figure.colorbar(im, ax=ax)
     cbar.ax.set_ylabel("Davies-Bouldin value", rotation=-90, va="bottom")
+    ax.set_xticks(x)
+    plt.xlabel("eps")
+    ax.set_yticks(y)
+    plt.ylabel("min_samples")
     plt.savefig(f"db_scan/{dataset}-db-score.png")
     plt.show()
+
+
     fig, ax = plt.subplots()
     im = plt.imshow(ch_all, cmap='hot', interpolation='nearest')
     cbar = ax.figure.colorbar(im, ax=ax)
     cbar.ax.set_ylabel("Calinski-Harabasz value", rotation=-90, va="bottom")
+    ax.set_xticks(x)
+    plt.xlabel("eps")
+    ax.set_yticks(y)
+    plt.ylabel("min_samples")
     plt.savefig(f"db_scan/{dataset}-ch-score.png")
     plt.show()
+
+
     fig, ax = plt.subplots()
     im = plt.imshow(ch_all, cmap='hot', interpolation='nearest')
     cbar = ax.figure.colorbar(im, ax=ax)
     cbar.ax.set_ylabel("Calinski-Harabasz value", rotation=-90, va="bottom")
+    ax.set_xticks(x)
+    plt.xlabel("eps")
+    ax.set_yticks(y)
+    plt.ylabel("min_samples")
     plt.savefig(f"db_scan/{dataset}-s-score.png")
     plt.show()
 
 
-models = ["xclara", "cassini", "3-spiral", "golfball", "birch-rg1-score"]
+models = ["xclara", "cassini", "3-spiral", "golfball", "birch-rg1"]
 
 for dataset in models:
     generate_plot(dataset)
