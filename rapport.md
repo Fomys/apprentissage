@@ -100,7 +100,7 @@ La méthode K-means se base sur la distance moyenne des point. Il s'avère être
 
 Le clustering agglomératif consiste à regrouper les données en clusters en utilisant une stratégie hiérarchique. Les avantages de cette méthode sont sa capacité à générer des clusters de tailles et de formes variables. Cependant, il présente également des inconvénients tels que la sensibilité aux choix initiaux et la complexité de l'algorithme. De plus, la vitesse de calcul peut être un problème pour certains jeux de données volumineux.
 
-Pour étudier cette méthode, nous utilisons la méthode AgglomerativeClustering de la bibiothèque scikit-learn. Nous faisons varier le paramètre *distance_threshold* qui représente la distance à partir de laquelle différents clusters ne seront plus fusionnés.
+Pour étudier cette méthode, nous utilisons la méthode AgglomerativeClustering de la bibiothèque scikit-learn. Nous faisons varier le paramètre *distance_threshold* qui représente la distance à partir de laquelle différents clusters ne seront plus fusionnés
 
 Nous utilisons également le paramètre *linkage* qui va définir la méthode utiliser afin de calculer la distance entre les points. Nous pouvons utiliser les paramètres suivant :
 
@@ -118,3 +118,24 @@ Nous utilisons également le paramètre *linkage* qui va définir la méthode ut
 
 
 # Partie 2 - Nouvelles données
+
+Pour visualiser comment seraient classées de nouvelles données, nous avons labelisé les points de l'espace pour les visualiser. Les résultats peuvent être trouvés sur les fichiers `{méthode}/{modèle}-extra.png`.
+
+## K-Means
+
+Pour K-Means on peut constater sur les différents modèles que la méthode groupe les nouveau points en fonction de la proximité avec les clusters existants. On comprend donc bien que la clusterisation de la spirale n'est pas possible avec cette méthode.
+
+Pour les jeux cassini et xclara le regroupement se fait assez bien. On constate magré tout que la séparation sur xclara n'est pas très claire au niveau du cluster en abs à droite. Cela peut être du à la densité du cluster qui est plus éloigné.
+![](k-means/xclara-extra.png)
+
+Pour cassini on retrouve exactement le découpage du plan et on peut constater que le groupe de points central n'est pas bien identifié.
+![](k-means/cassini-extra.png)
+
+Pour 3-spiral on constate là aussi que le découpage proposé n'est pas du tout en adéquation avec les points. Cette méthode ne peut donc pas s'appliquer
+![](k-means/3-spiral-extra.png)
+
+
+
+
+
+

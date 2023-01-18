@@ -50,6 +50,7 @@ def load_data(dataset: str) -> np.ndarray:
 
 
 def compute(dataset, datanp, linkage, k, distance_threshold=None, trace_time=False):
+    print(dataset, linkage, k, distance_threshold, trace_time)
     # print(" Dendrogramme 'single' donnees initiales ")
     # linked_mat = shc.linkage(datanp, 'single')
     # plt.figure(figsize=(12, 12))
@@ -92,9 +93,13 @@ def compute(dataset, datanp, linkage, k, distance_threshold=None, trace_time=Fal
     f0 = datanp[:, 0]
     f1 = datanp[:, 1]
     plt.scatter(f0, f1, c=labels, s=8)
-    plt.title(f"{dataset}: agglomerative clustering with {k} clusters")
     os.makedirs(f"agglomerative_clustering/{dataset}", exist_ok=True)
-    plt.savefig(f"agglomerative_clustering/{dataset}/k={k}-{linkage}.png")
+    if distance_threshold:
+        plt.title(f"{dataset}: agglomerative clustering with distance threshold={distance_threshold}")
+        plt.savefig(f"agglomerative_clustering/{dataset}/{linkage}-{distance_threshold}.png")
+    else:
+        plt.title(f"{dataset}: agglomerative clustering with cluster count={k}")
+        plt.savefig(f"agglomerative_clustering/{dataset}/{linkage}-k={k}.png")
     plt.clf()
 
     return davies_bouldin_score, calinski_harabasz_score, silhouette_score
@@ -142,7 +147,8 @@ def generate_plot(dataset, trace_time=False, max_clusters=10):
 
 
 
-models = ["xclara", "cassini", "3-spiral", "golfball"]
+models = ["cassini",]
+#"xclara" , "3-spiral", "golfball"]
 
 for dataset in models:
     generate_plot(dataset)
