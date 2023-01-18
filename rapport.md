@@ -1,31 +1,39 @@
- # Rapport
+ # Rapport TP Machine learning
+ 
+• Plan :
+– Introduction (0,5 page). Fournir le lien vers le code en fin de l’introduction.
+– Partie 1 : Points forts et points faibles identifiés pour les différentes méthodes de clustering
+étudiées(4)
+– Partie 2 : Etude et Analyse comparative de méthodes de clustering sur de nouvelles données
+fournies (6)
+– Conclusion (0,5 page)
 
-## Jeu de données
 
-Pour ce TP, nous utilisons des jeux de données artificiels que nous lisons avec le package *arff* de *scipy.io*
+## Introduction
 
-    import warnings
-    
-    import numpy as np
-    import matplotlib.pyplot as plt
-    from scipy.io import arff
-    from sklearn import cluster, metrics
-    from time import time
-    print()
-    warnings.filterwarnings("ignore")
-    
-    path = './clustering-benchmark/src/main/resources/datasets/artificial/'
-    
-    
-    def load_data(dataset: str) -> np.ndarray:
-        databrut = arff.loadarff(open(path + dataset + ".arff", 'r'))
-        return np.array([[x[0], x[1]] for x in databrut[0]])
+Dans cette série de TP nous allons mettre en pratique les connaissances acquises en apprentissage non-supervisé. L'objectif est de comparer différentes méthodes de clustering (k-means, clustering agglomératif et DB Scan Clustering). Ces méthodes seront appliquées sur plusieurs jeux de données en 2 dimensions. Dans une première partie, nous analyserons chaque méthode et dégagerons des points forts et faibles pour chacun d'entre elles. Enfin, dans une seconde partie nous fournirons des nouvelles données à chaque méthode et en tirerons une analyse comparative.
 
-## Méthode d'évaluation
+## Particularités des différentes méthodes de clustering
+
+
+### Jeux de données
+
+L'objectif de cette partie est d'analyser les algorithmes de clustering disponibles. Pour cela on a choisis différents jeux de données pour extraire des informations utiles sur les résultats. Les jeux de données choisies sont donc:
+
+**x-clara**, un jeu de donnée qui montre trois groupes de données qui correspond à une vision "classique" d'un cluster: groupe de points dense et distincts;
+
+**cassini**, là encore, un jeu de donnée qui montre aussi beaucoup de séparation entre les différents clusters. La particularité de celui ci c'est que les groupes ne sont pas très denses et pas forcément circulaires.
+
+**3-spiral**, un jeu de donnée pour lequel la notion de cluster est plus complexe à identifier. Un oeuil humain voudrait grouper chaque branche de la spirale mais elles ne correspond plus à un groupe dense de point.
+
+**birch-rg1**, un jeu de donnée qui ne représente aucun cluster, par contre il comporte un grand nombre de point, ce qui permettra de comparer les vitesse d'exécution des trois algorithmes.
+
+## Méthodes d'évaluation
 
 Pour évaluer la qualité de nos clusterings avec la méthode k-means, nous disposons de 3 métriques d'évaluation :
 
 ### Critère de Calinski-Harabasz
+
 Ce critère est le ratio de la somme des dispersions entre les clusters et à l'intérieur des clusters et de la dispersion pour tous les clusters. On définit ici la dispersion comme la somme des distances au carré.
 
 Plus ce critère est élevé, plus les clusters évalués sont bien définis.
@@ -57,48 +65,51 @@ qui comporte 3 groupes mal identifiés :
 
 ![mauvais_exemple](k-means/cassini-k=3.png)
 
-Appliquez itérativement la méthode précédente pour déterminer le bon nombre de clusters à l’aide de métriques d’évaluation 
-- Mesurez le temps de calcul
-- Arrivez-vous à retrouver le résultat attendu à l’aide de ces métriques d’évaluation ?
+Autre exemple de clusters mal identifiés pour 3-spiral :
 
-Ci-dessous, voici une application de la méthode du "coude" pour les 4 jeux de données que nous avons décidé d'utiliser.
+![3-spiral-k=3.png](k-means%2F3-spiral-k%3D3.png)
 
-![](k-means/3-spiral-score.png)
-![](k-means/birch-rg1-score.png)
-![](k-means/cassini-score.png)
-![](k-means/xclara-score.png)
+Ci-dessous, voici une application de la méthode du "coude" pour les 3 jeux de données que nous avons décidé d'utiliser.
 
-Tableau récapitulatif
+![3-spiral-score.png](k-means%2F3-spiral-score.png)
+![cassini-score.png](k-means%2Fcassini-score.png)
+![xclara-score.png](k-means%2Fxclara-score.png)
 
-| Jeu de données | Nombre de clusters idéal |
-|:---------------|:-------------------------|
-| 3-spiral       |  3                       |
-| birch-rg1      | 4                        |
-| cassini        | 5                        |
-| xclara         | 3                        |
+Nous avons également mesuré le temps de calcul pour chaque clustering :
 
-## Limites de la méthode k-means                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
+![3-spiral-compute-time.png](k-means%2F3-spiral-compute-time.png)
+![cassini-compute-time.png](k-means%2Fcassini-compute-time.png)
+![xclara-compute-time.png](k-means%2Fxclara-compute-time.png)
 
+### Tableau récapitulatif
 
+| Jeu de données | Nombre de clusters idéal | Temps calcul associé (s) |
+|:---------------|:-------------------------|:-------------------------|
+| 3-spiral       | 3                        | 0.062                    | 4                        |
+| cassini        | 5                        | 0.058                    |
+| xclara         | 3                        | 0.052                    |
 
-# Clustering agglomératif
-
-![bon_exemple_agglomerative-complete](agglomerative_clustering/xclara/k=3-complete.png)
-
-
-Choisissez quelques (2 ou 3) jeux de données pour lesquels il vous semble que la méthode de
-clustering aggomératif devrait identifier correctement les clusters.
-• Appliquez itérativement la méthode de clustering agglomératif en faisant varier le seuil de dis-
-tance afin de déterminer une bonne solution de clustering à l’aide des métriques d’évaluation
-– Considérez différentes manières de combiner des clusters (single, average, complete, ward
-linkage), uniquement pour la distance euclidienne. Par défaut l’option connectivity est
-laissée à none.
-– Mesurez le temps de calcul
-– Arrivez-vous à retrouver le résultat attendu à l’aide de ces critères d’évaluation ?
-• Avez-vous automatisé votre code ? Recommencez en faisant varier le nombre de clusters
-3.3 Limites de la méthode
-Choisissez quelques (2 ou 3) jeux de données pour lesquels il vous semble que la méthode de
-clustering agglométarif aura des difficultés pour identifier correctement les clusters.
-Appliquez la méthode de clustering agglomératif sur ces jeux de données pour confirmer vos choix.
+### Limites de la méthode k-means                                                                        
+La méthode K-means se base sur la distance moyenne des point. Il s'avère être efficace pour les clusters "cirulaires" tels que xclara. On observe une limite pour 
 
 
+
+## Clustering agglomératif
+
+### Intérêts de la méthode
+
+Le clustering agglomératif consiste à regrouper les données en clusters en utilisant une stratégie hiérarchique. Les avantages de cette méthode sont sa capacité à générer des clusters de tailles et de formes variables. Cependant, il présente également des inconvénients tels que la sensibilité aux choix initiaux et la complexité de l'algorithme. De plus, la vitesse de calcul peut être un problème pour certains jeux de données volumineux.
+
+Pour étudier cette méthode, nous utilisons la méthode AgglomerativeClustering de la bibiothèque scikit-learn. Nous faisons varier le paramètre *distance_threshold* qui représente la distance à partir de laquelle différents clusters ne seront plus fusionnés.
+
+Nous utilisons également 
+
+
+
+### Limites de la méthode
+
+
+
+
+
+# Partie 2 - Nouvelles données
