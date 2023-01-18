@@ -1,12 +1,7 @@
  # Rapport TP Machine learning
  
-• Plan :
-– Introduction (0,5 page). Fournir le lien vers le code en fin de l’introduction.
-– Partie 1 : Points forts et points faibles identifiés pour les différentes méthodes de clustering
-étudiées(4)
-– Partie 2 : Etude et Analyse comparative de méthodes de clustering sur de nouvelles données
-fournies (6)
-– Conclusion (0,5 page)
+*CHAUVET Louis*
+*GALLOO Augustin*
 
 
 ## Introduction
@@ -96,8 +91,6 @@ La méthode K-means se base sur la distance moyenne des point. Il s'avère être
 
 ## Clustering agglomératif
 
-### Intérêts de la méthode
-
 Le clustering agglomératif consiste à regrouper les données en clusters en utilisant une stratégie hiérarchique. Les avantages de cette méthode sont sa capacité à générer des clusters de tailles et de formes variables. Cependant, il présente également des inconvénients tels que la sensibilité aux choix initiaux et la complexité de l'algorithme. De plus, la vitesse de calcul peut être un problème pour certains jeux de données volumineux.
 
 Pour étudier cette méthode, nous utilisons la méthode AgglomerativeClustering de la bibiothèque scikit-learn. Nous faisons varier le paramètre *distance_threshold* qui représente la distance à partir de laquelle différents clusters ne seront plus fusionnés
@@ -109,9 +102,48 @@ Nous utilisons également le paramètre *linkage* qui va définir la méthode ut
 - **complete** : utilise la distance maximum entre toutes les observations de deux sets.
 - **single** : utilise le minimum des distances entre toutes les observations de deux sets.
 
+Nous choisissons premièrement d'utiliser le linkage 'average' pour le jeu de données *cassini* en faisant varier la distance du threshold :
 
+![average-0.1.png](agglomerative_clustering/cassini/average-0.1.png)
 
-### Limites de la méthode
+![average-0.5.png](agglomerative_clustering/cassini/average-0.5.png)
+
+![average-2.0.png](agglomerative_clustering/cassini/average-2.0.png)
+
+On comprend bien ici l'intêret de la méthode. Elle va venir classer chaque point de manière hiérarchique un par un en fonction de sa distance aux autres. On crée ici autant de clusters que nécessaires pour classer tous les points en respectant la distance fournie par le threshold. Ici, on voit bien les multiples clusters de cassini pour une faible distance, ce nombre de clusters tend à se réduire pour une grande distance.
+
+Afin d'étudier ensuite l'impact de la méthode de linkage, nous mettons le paramètre threshold à None et changeons successivement le linkage, toujours pour cassini. Voici une représentation graphique de critères d'évaluation pour chaque paramètre de linkage possible :
+
+![cassini-average-None-score.png](agglomerative_clustering/cassini-average-None-score.png)
+
+![cassini-complete-None-score.png](agglomerative_clustering/cassini-complete-None-score.png)
+
+![cassini-single-score.png](agglomerative_clustering/cassini-single-score.png)
+
+![cassini-ward-None-score.png](agglomerative_clustering/cassini-ward-None-score.png)
+
+Voici un tableau récapitulatif de la méthode du coude pour les deux jeux de données :
+
+| Jeu de données | Méthode de linkage | Nombre de clusters idéal | 
+|:---------------|:-------------------|:-------------------------|
+| 3-spiral       | average            | 6                        |  
+| 3-spiral       | complete           | 4                        |
+| 3-spiral       | single             | 7                        |
+| 3-spiral       | ward               | 3                        |
+| cassini        | average            | 3                        |  
+| cassini        | complete           | 5                        |
+| cassini        | single             | non-exploitable          |
+| cassini        | ward               | 5                        |
+| xclara         | average            | 3                        |  
+| xclara         | complete           | 3                        |
+| xclara         | single             | non-exploitable          |
+| xclara         | ward               | 3                        |
+
+Ce que nous pouvons tirer de ce tableau récapitulatif est que le jeu de données '3-spiral' n'est pas facilement clusterisable avec cette méthode, chaque paramètre de linkage nous fournit un nombre de clusters idéal différent. De plus, nous pouvons également relever que le paramètre 'single' n'est pas performant pour les sets donnés, et  ce, même pour 'xclara' qui est pourtant celui qui a été le mieux identifié par les autres paramètres de linkage.
+
+## DBScan
+
+La méthode DBscan permet de regrouper les points par densité. L'avantage de cette méthode c'est qu'elle regroupe les points en observant les points les plus proches tout en excluant les points isolés, le bruit. Avec un tel algorithme, on peut espérer que les 3 spirales soient bien identifiées.
 
 
 
