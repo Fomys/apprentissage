@@ -62,19 +62,23 @@ qui comporte 3 groupes mal identifiés :
 
 Autre exemple de clusters mal identifiés pour 3-spiral :
 
-![3-spiral-k=3.png](k-means%2F3-spiral-k%3D3.png)
+![3-spiral-k=3.png](k-means/3-spiral-k%3D3.png)
 
 Ci-dessous, voici une application de la méthode du "coude" pour les 3 jeux de données que nous avons décidé d'utiliser.
 
-![3-spiral-score.png](k-means%2F3-spiral-score.png)
-![cassini-score.png](k-means%2Fcassini-score.png)
-![xclara-score.png](k-means%2Fxclara-score.png)
+![3-spiral-score.png](k-means/3-spiral-score.png)
+
+![cassini-score.png](k-means/cassini-score.png)
+
+![xclara-score.png](k-means/xclara-score.png)
 
 Nous avons également mesuré le temps de calcul pour chaque clustering :
 
-![3-spiral-compute-time.png](k-means%2F3-spiral-compute-time.png)
-![cassini-compute-time.png](k-means%2Fcassini-compute-time.png)
-![xclara-compute-time.png](k-means%2Fxclara-compute-time.png)
+![3-spiral-compute-time.png](k-means/3-spiral-compute-time.png)
+
+![cassini-compute-time.png](k-means/cassini-compute-time.png)
+
+![xclara-compute-time.png](k-means/xclara-compute-time.png)
 
 ### Tableau récapitulatif
 
@@ -145,13 +149,46 @@ Ce que nous pouvons tirer de ce tableau récapitulatif est que le jeu de donnée
 
 La méthode DBscan permet de regrouper les points par densité. L'avantage de cette méthode c'est qu'elle regroupe les points en observant les points les plus proches tout en excluant les points isolés, le bruit. Avec un tel algorithme, on peut espérer que les 3 spirales soient bien identifiées.
 
+Les deux paramètres principaux de cette méthode sont:
+- *eps*: la distance maximale entre deux points pour qu'ils appartiennent au même groupe;
+- *min_samples*: le nombre de point minimum pour considérer un groupe comme un groupe et pas du bruit.
 
+L'avantage de cette méthode est qu'il n'est pas nécessaire de spécifier le nombre de groupe à trouver, l'algorithme arrivera à le trouver seul.
 
+On peut constater ici que les groupes sont très bien identifiés sur les trois modèles:
 
+![](db_scan/3-spiral/0.9-1.png)
+
+![](db_scan/cassini/0.2-1.png)
+
+![](db_scan/xclara/10-50.png)
+
+### Avantages
+
+Les trois exemples ci-dessus permettent d'illustrer les principaux avantages de la méthode:
+- Détection automatique du nombre de cluster à identifier, sur les trois modèles la méthode a bien identifié les 3 clusters;
+- *3-spiral* montre qu'il est possible d'identifier des groupes peu dense et de manière plus "naturelle" contrairement aux autre méthodes;
+- *xclara* montre que les points "isolés" sont bien considérés comme du bruit (violet sur l'image).
+
+Cette méthode est celle qui a pu identifier le mieux les 3 modèles.
+
+### Défauts
+
+Pour obtenir la classification au dessus, il a fallu passer du temps pour définir les paramètres *eps* et *min_samples*. Il faut bien connaitre les données et étudier les regroupements voulus pour choisir les bonnes valeurs. Par exemple, si on compare xclara et cassini, xclara a des points aux coordonnées comprises entre -1.5 et 1.5 alors que xclara entre -20 et 100. Le paramètre *eps* change donc énormément entre ces deux modèles (0.2 pour cassini, 10 pour xclara).
+
+La même réflexion peut être faite pour le nombre minimum de point pour considérer un cluster, c'est lui qui va permettre de ne pas confondre plusieurs points "bruits" agglomérés avec un cluster standard. 
+
+Cet algorithme est également peu adapté lorsque les groupes ne sont distincts et 
+
+Les défauts de la méthode DBSCAN incluent:
+
+    Elle est sensible aux paramètres eps et minPts, qui doivent être choisis avec soin pour obtenir des résultats satisfaisants.
+    Elle peut avoir des difficultés à gérer les densités de densité variable.
+    Il peut être difficile de déterminer la distance appropriée à utiliser pour définir les groupes.
+    Il peut être inadapté pour des données en grande dimension ou des données à haute densité
+    Il est gourmand en ressources pour de grandes quantités de données.
 
 # Partie 2 - Nouvelles données
-
-Pour visualiser comment seraient classées de nouvelles données, nous avons labelisé les points de l'espace pour les visualiser. Les résultats peuvent être trouvés sur les fichiers `{méthode}/{modèle}-extra.png`.
 
 ## K-Means
 
@@ -166,7 +203,9 @@ Pour cassini on retrouve exactement le découpage du plan et on peut constater q
 Pour 3-spiral on constate là aussi que le découpage proposé n'est pas du tout en adéquation avec les points. Cette méthode ne peut donc pas s'appliquer
 ![](k-means/3-spiral-extra.png)
 
+## Agglomerative clustering et DBScan
 
+Il n'est pas possible de faire la même chose pour DBScan et agglomerative clustering car ce sont des algorithmes de classification et pas de prédiction. Le même graphique que pour K-Means n'a pas de sens et fausserait complètement tous les résultats.
 
 
 
