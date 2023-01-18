@@ -112,7 +112,7 @@ def generate_plot(dataset, trace_time=False, max_clusters=10):
     ch_all = []
     s_all = []
     for linkage in ('ward', 'complete', 'average', 'single'):
-        for distance_threshold in (None, 1, 3, 5):
+        for distance_threshold in (None, 0.1, 0.5, 2.0):
             db = []
             ch = []
             s = []
