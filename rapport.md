@@ -102,7 +102,7 @@ Le clustering agglomératif consiste à regrouper les données en clusters en ut
 
 Pour étudier cette méthode, nous utilisons la méthode AgglomerativeClustering de la bibiothèque scikit-learn. Nous faisons varier le paramètre *distance_threshold* qui représente la distance à partir de laquelle différents clusters ne seront plus fusionnés.
 
-Nous utilisons également 
+Nous utilisons également le paramètre *linkage* qui va définir la méthode utiliser afin de calculer la distance entre les points. 
 
 
 
