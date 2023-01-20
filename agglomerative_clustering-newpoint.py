@@ -1,3 +1,4 @@
+import copy
 import warnings
 
 import numpy as np
@@ -30,20 +31,22 @@ def generate_plot(dataset):
         n_clusters=3,
         compute_full_tree=True)
     model.fit(datanp)
+    original_model = model
     min_x, max_x, min_y, max_y = extract_min_max(datanp)
 
-    X = np.linspace(min_x, max_x, 200)
-    Y = np.linspace(min_y, max_y, 200)
+    X = np.linspace(min_x, max_x, 10)
+    Y = np.linspace(min_y, max_y, 10)
     L = np.zeros((X.shape[0], Y.shape[0]))
     for x, x_v in tqdm(enumerate(X)):
         for y, y_v in enumerate(Y):
-            L[x][y] = model.predict([(y_v, x_v), ])[0]
+            model = copy.deepcopy(original_model)
+            L[x][y] = cluster.AgglomerativeClustering(linkage="ward",n_clusters=3,compute_full_tree=True).fit_predict(datanp+[(y_v, x_v), ])[-1]
 
     fig, ax = plt.subplots()
-    ax.pcolormesh(X, Y, L)
+    ax.pcolormesh(X, Y, L, shading="gouraud")
     f0 = datanp[:, 0]
     f1 = datanp[:, 1]
-    plt.scatter(f0, f1, c=model.labels_, s=8, edgecolors= "black")
+    plt.scatter(f0, f1, c=model.labels_, s=8, edgecolors="black")
     plt.savefig(f"agglomerative_clustering/{dataset}-extra.png")
     plt.plot()
 

@@ -1,160 +1,181 @@
-import os
 import warnings
 
-import matplotlib
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.cluster.hierarchy import linkage, dendrogram
 from scipy.io import arff
 from sklearn import cluster, metrics
 from time import time
 
-print()
 warnings.filterwarnings("ignore")
 
 path = './clustering-benchmark/src/main/resources/datasets/artificial/'
-path2 = './dataset-rapport/'
 
-import scipy.cluster.hierarchy as shc
-
-
-# Donnees dans datanp
-
-
-# tps1 = time.time()
-# model = cluster.AgglomerativeClustering(distance_threshold=10, linkage=' single ', n_clusters=None)
-# model = model.fit(datanp)
-# tps2 = time.time()
-# labels = model.labels_
-# k = model.n_clusters_
-# leaves = model.n_leaves_
-# # Affichage clustering
-# plt.scatter(f0, f1, c=labels, s=8)
-# plt.title(" Resultat du clustering ")
-# plt.show()
-# print(" nb clusters = ", k, " , nb feuilles = ", leaves, " runtime = ", round((tps2 - tps1) * 1000, 2), " ms ")
-# # set the number of clusters
-# k = 4
-# tps1 = time.time()
-# model = cluster.AgglomerativeClustering(linkage=' single ', n_clusters=k)
-# model = model.fit(datanp)
-# tps2 = time.time()
-# labels = model.labels_
-# kres = model.n_clusters_
-# leaves = model.n_leaves_
-
-
-# matplotlib.use('Qt5Agg')
 
 def load_data(dataset: str) -> np.ndarray:
     databrut = arff.loadarff(open(path + dataset + ".arff", 'r'))
     return np.array([[x[0], x[1]] for x in databrut[0]])
 
-def load_data2(dataset : str) -> np.ndarray:
-    databrut = np.loadtxt(path2 + dataset + ".txt")
-    data = [[x[0],x[1]] for x in databrut]
-    return np.array([[f[0], f[1]] for f in data])
 
-
-def compute(dataset, datanp, linkage, k, distance_threshold=None, trace_time=False):
-    print(dataset, linkage, k, distance_threshold, trace_time)
-    # print(" Dendrogramme 'single' donnees initiales ")
-    # linked_mat = shc.linkage(datanp, 'single')
-    # plt.figure(figsize=(12, 12))
-    # shc.dendrogram(linked_mat,
-    #                orientation='top',
-    #                distance_sort='descending',
-    #                show_leaf_counts=False)
-    # plt.show()
-    begin_fit_time = time()
-    model = cluster.AgglomerativeClustering(linkage=linkage, n_clusters=k if distance_threshold is None else None, distance_threshold=distance_threshold, compute_full_tree=True if distance_threshold is None else 'auto')
-    model.fit(datanp)
-    labels = model.labels_
-    end_fit_time = time()
-    if trace_time:
-        print(f"Fit time for {dataset} (k={k}): {end_fit_time - begin_fit_time:.2}s")
-    #
-    begin_score_davies_bouldin = time()
-    davies_bouldin_score = metrics.davies_bouldin_score(datanp, labels)
-    end_score_davies_bouldin = time()
-    if trace_time:
-        print(f"Davies-Bouldin time for {dataset} (k={k}: {end_score_davies_bouldin - begin_score_davies_bouldin:.2}s")
-
-    begin_score_calinski_harabasz = time()
-    calinski_harabasz_score = metrics.calinski_harabasz_score(datanp, labels)
-    end_score_calinski_harabasz = time()
-    if trace_time:
-        print(
-            f"Calinski-Harabasz time for {dataset} (k={k}): {end_score_calinski_harabasz - begin_score_calinski_harabasz:.2}s")
-    begin_score_silhouette_score = time()
-    silhouette_score = metrics.silhouette_score(datanp, labels)
-    end_score_silhouette_score = time()
-    if trace_time:
-        print(
-            f"Silhouette time for {dataset} (k={k}): {end_score_silhouette_score - begin_score_silhouette_score:.2}s")
-
-    # print(f"Davies-Bouldin score for {dataset} (k={k}): {davies_bouldin_score}")
-    # print(f"Calinski-Harabasz score for {dataset} (k={k}): {calinski_harabasz_score}")
-    # print(f"Silhouette score for {dataset} (k={k}): {calinski_harabasz_score}")
-
-    f0 = datanp[:, 0]
-    f1 = datanp[:, 1]
-    plt.scatter(f0, f1, c=labels, s=8)
-    os.makedirs(f"agglomerative_clustering/{dataset}", exist_ok=True)
-    if distance_threshold:
-        plt.title(f"{dataset}: agglomerative clustering with distance threshold={distance_threshold}")
-        plt.savefig(f"agglomerative_clustering/{dataset}-{linkage}-{distance_threshold}.png")
-    else:
-        plt.title(f"{dataset}: agglomerative clustering with cluster count={k}")
-        plt.savefig(f"agglomerative_clustering/{dataset}-{linkage}-k={k}.png")
+def plot(dataset, k, method) -> (np.ndarray, cluster.KMeans):
+    data = load_data(dataset)
+    agglomerative_clustering = cluster.AgglomerativeClustering(n_clusters=k, linkage=method)
+    agglomerative_clustering.fit(data)
+    plt.scatter(data[:, 0], data[:, 1], c=agglomerative_clustering.labels_, s=8)
+    plt.title(f"{dataset}: agglomerative_clustering avec {k} clusters")
+    plt.savefig(f"agglomerative_clustering/{dataset}-{method}-k={k}.png", dpi=100)
     plt.clf()
-
-    return davies_bouldin_score, calinski_harabasz_score, silhouette_score
-
-
-def generate_plot(dataset, trace_time=False, max_clusters=16):
-    begin_load_time = time()
-    datanp = load_data2(dataset)
-    end_load_time = time()
-    if trace_time:
-        print(f"Load time for {dataset}: {end_load_time - begin_load_time:.2}s")
-
-    cluster_count = list(range(15, max_clusters))
-    db_all = []
-    ch_all = []
-    s_all = []
-    for linkage in ('average',):
-        for distance_threshold in (None, 25e3):
-            db = []
-            ch = []
-            s = []
-            objects = []
-            for k in cluster_count:
-                db_s, ch_s, s_s = compute(dataset, datanp, linkage, k, trace_time=trace_time, distance_threshold=distance_threshold)
-                db.append(db_s)
-                ch.append(1 / ch_s)
-                s.append(s_s)
-                objects.append(f"k={k}")
-            db_all.append(db)
-            ch_all.append(ch)
-            s_all.append(s)
-
-            fig, ax1 = plt.subplots()
-            ax2 = ax1.twinx()
-            db_plt = ax1.plot(cluster_count, db, color="r", label="Davies-Bouldin score")
-            s_plt = ax1.plot(cluster_count, s, color="g", label="Silouhette score")
-            ch_plt = ax2.plot(cluster_count, ch, color="b", label="Calinski-Harabasz (inverse)")
-            # added these three lines
-            lns = db_plt + ch_plt + s_plt
-            labs = [l.get_label() for l in lns]
-            plt.legend(lns, labs)
-            plt.title(f"{dataset}: scores vs number of clusters with linkage {linkage}\ndistance threshold of {distance_threshold}")
-            plt.savefig(f"agglomerative_clustering/{dataset}-{linkage}-{distance_threshold}-score.png")
-            plt.show()
+    return data, agglomerative_clustering
 
 
+def plot2(dataset, d, method) -> (np.ndarray, cluster.KMeans):
+    data = load_data(dataset)
+    agglomerative_clustering = cluster.AgglomerativeClustering(n_clusters=None, linkage=method, distance_threshold=d)
+    agglomerative_clustering.fit(data)
+    plt.scatter(data[:, 0], data[:, 1], c=agglomerative_clustering.labels_, s=8)
+    plt.title(f"{dataset}: agglomerative_clustering avec un threshold de {d}\n{agglomerative_clustering.n_clusters_} clusters trouvés")
+    plt.savefig(f"agglomerative_clustering/{dataset}-{method}-d={d}.png", dpi=100)
+    plt.clf()
+    return data, agglomerative_clustering
 
-models = [ "x4"]
-#"xclara" , "3-spiral", "golfball"]
 
-for dataset in models:
-    generate_plot(dataset)
+def compute(dataset):
+    print(f"dataset: {dataset}")
+    data = load_data(dataset)
+    for method in ["ward", "complete", "average", "single"]:
+        linked_mat = linkage(data, method)
+        dendrogram(linked_mat, orientation='top',
+                   distance_sort='descending', show_leaf_counts=False)
+        plt.title(f"Dendogramme du dataset {dataset}, méthode {method}")
+        plt.savefig(f"agglomerative_clustering/{dataset}-dendogram-{method}.png", dpi=100)
+        plt.clf()
+
+    davies_bouldins = []
+    calinski_harabaszs = []
+    silhouettes = []
+    durations = []
+    for method in ["ward", "complete", "average", "single"]:
+        davies_bouldin = []
+        calinski_harabasz = []
+        silhouette = []
+        duration = []
+        for k in range(2, 10):
+            t1 = time()
+            data, agglomerative_clustering = plot(dataset, k, method)
+            t2 = time()
+            davies_bouldin.append((k, metrics.davies_bouldin_score(data, agglomerative_clustering.labels_)))
+            calinski_harabasz.append((k, metrics.calinski_harabasz_score(data, agglomerative_clustering.labels_)))
+            silhouette.append((k, metrics.silhouette_score(data, agglomerative_clustering.labels_)))
+            duration.append((k, t2 - t1))
+        davies_bouldins.append(davies_bouldin)
+        calinski_harabaszs.append(calinski_harabasz)
+        silhouettes.append(silhouette)
+    for (s, m) in zip(davies_bouldins, ["ward", "complete", "average", "single"]):
+        plt.plot(*zip(*s), label=m)
+    plt.legend()
+    plt.ylabel("Score de Davies-Bouldin")
+    plt.xlabel("Nombre de clusters")
+    plt.title("Score de Davies-Bouldin en fonction du nombre de cluster et de la méthode")
+    plt.savefig(f"agglomerative_clustering/{dataset}-davies_bouldin.png", dpi=100)
+    plt.clf()
+    for (s, m) in zip(calinski_harabaszs, ["ward", "complete", "average", "single"]):
+        plt.plot(*zip(*s), label=m)
+    plt.legend()
+    plt.ylabel("Score de Calinski-Harabasz")
+    plt.xlabel("Nombre de clusters")
+    plt.title("Score de Calinski-Harabasz en fonction du nombre de cluster et de la méthode")
+    plt.savefig(f"agglomerative_clustering/{dataset}-calinski_harabasz.png", dpi=100)
+    plt.clf()
+    for (s, m) in zip(silhouettes, ["ward", "complete", "average", "single"]):
+        plt.plot(*zip(*s), label=m)
+    plt.legend()
+    plt.ylabel("Score de Silhouette")
+    plt.xlabel("Nombre de clusters")
+    plt.title("Score de Silhouette en fonction du nombre de cluster et de la méthode")
+    plt.savefig(f"agglomerative_clustering/{dataset}-silhouette.png", dpi=100)
+    plt.clf()
+    return durations
+
+
+def compute2(dataset, thresholds):
+    print(f"dataset: {dataset}, {thresholds}")
+
+    davies_bouldins = []
+    calinski_harabaszs = []
+    silhouettes = []
+    durations = []
+    cluster_counts = []
+    for method in ["ward", "complete", "average", "single"]:
+        davies_bouldin = []
+        calinski_harabasz = []
+        silhouette = []
+        duration = []
+        cluster_count = []
+        for k in thresholds:
+            t1 = time()
+            data, agglomerative_clustering = plot2(dataset, k, method)
+            cluster_count.append((k,agglomerative_clustering.n_clusters_))
+            t2 = time()
+            try:
+                davies_bouldin.append((k, metrics.davies_bouldin_score(data, agglomerative_clustering.labels_)))
+                calinski_harabasz.append((k, metrics.calinski_harabasz_score(data, agglomerative_clustering.labels_)))
+                silhouette.append((k, metrics.silhouette_score(data, agglomerative_clustering.labels_)))
+                duration.append((k, t2 - t1))
+            except ValueError:
+                print("err:", dataset, method, "d=", k)
+        davies_bouldins.append(davies_bouldin)
+        calinski_harabaszs.append(calinski_harabasz)
+        silhouettes.append(silhouette)
+        cluster_counts.append(cluster_count)
+    for (s, m) in zip(davies_bouldins, ["ward", "complete", "average", "single"]):
+        plt.plot(*zip(*s), label=m, marker='.')
+    plt.legend()
+    plt.ylabel("Score de Davies-Bouldin")
+    plt.xlabel("Threshold")
+    plt.title("Score de Davies-Bouldin en fonction du threshold et de la méthode")
+    plt.savefig(f"agglomerative_clustering/{dataset}-threshold-davies_bouldin.png", dpi=100)
+    plt.clf()
+    for (s, m) in zip(cluster_counts, ["ward", "complete", "average", "single"]):
+        plt.plot(*zip(*s), label=m, marker='.')
+    plt.legend()
+    plt.ylabel("Nombre de clusters")
+    plt.xlabel("Threshold")
+    plt.yscale('log')
+    plt.title("Score de Davies-Bouldin en fonction du threshold et de la méthode")
+    plt.savefig(f"agglomerative_clustering/{dataset}-cluster_count.png", dpi=100)
+    plt.clf()
+    plt.yscale('linear')
+    for (s, m) in zip(calinski_harabaszs, ["ward", "complete", "average", "single"]):
+        plt.plot(*zip(*s), label=m, marker='.')
+    plt.legend()
+    plt.ylabel("Score de Calinski-Harabasz")
+    plt.xlabel("Threshold")
+    plt.title("Score de Calinski-Harabasz en fonction du threshold et de la méthode")
+    plt.savefig(f"agglomerative_clustering/{dataset}-threshold-calinski_harabasz.png", dpi=100)
+    plt.clf()
+    for (s, m) in zip(silhouettes, ["ward", "complete", "average", "single"]):
+        plt.plot(*zip(*s), label=m, marker='.')
+    plt.legend()
+    plt.ylabel("Score de Silhouette")
+    plt.xlabel("Threshold")
+    plt.title("Score de Silhouette en fonction du threshold et de la méthode")
+    plt.savefig(f"agglomerative_clustering/{dataset}-threshold-silhouette.png", dpi=100)
+    plt.clf()
+    return durations
+
+
+times = []
+models = ["xclara", "cassini", "3-spiral", ]
+for d in models:
+    times.append(compute(d))
+for d, h in [("xclara", np.linspace(2, 102, 10)), ("cassini", np.linspace(0.1, 5.0, 100)), ("3-spiral", np.linspace(2, 20, 10))]:
+    times.append(compute2(d, h))
+
+for (duration, model) in zip(times, models):
+    plt.plot(*zip(*duration), label=model)
+plt.xlabel("Nombre de cluster")
+plt.ylabel("Temps de calcul (en s)")
+plt.title("Temps de calcul pour chaque modèle en fonction du nombre de cluster")
+plt.legend()
+plt.savefig(f"agglomerative_clustering/time.png", dpi=100)
+plt.clf()

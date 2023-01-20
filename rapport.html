@@ -1,0 +1,179 @@
+<p># Rapport TP Machine learning</p>
+<p>• Plan : – Introduction (0,5 page). Fournir le lien vers le code en
+fin de l’introduction. – Partie 1 : Points forts et points faibles
+identifiés pour les différentes méthodes de clustering étudiées(4) –
+Partie 2 : Etude et Analyse comparative de méthodes de clustering sur de
+nouvelles données fournies (6) – Conclusion (0,5 page)</p>
+<h2 id="introduction">Introduction</h2>
+<p>Dans cette série de TP nous allons mettre en pratique les
+connaissances acquises en apprentissage non-supervisé. L’objectif est de
+comparer différentes méthodes de clustering (k-means, clustering
+agglomératif et DB Scan Clustering). Ces méthodes seront appliquées sur
+plusieurs jeux de données en 2 dimensions. Dans une première partie,
+nous analyserons chaque méthode et dégagerons des points forts et
+faibles pour chacun d’entre elles. Enfin, dans une seconde partie nous
+fournirons des nouvelles données à chaque méthode et en tirerons une
+analyse comparative.</p>
+<h2
+id="particularités-des-différentes-méthodes-de-clustering">Particularités
+des différentes méthodes de clustering</h2>
+<h3 id="jeux-de-données">Jeux de données</h3>
+<p>L’objectif de cette partie est d’analyser les algorithmes de
+clustering disponibles. Pour cela on a choisis différents jeux de
+données pour extraire des informations utiles sur les résultats. Les
+jeux de données choisies sont donc:</p>
+<p><strong>x-clara</strong>, un jeu de donnée qui montre trois groupes
+de données qui correspond à une vision “classique” d’un cluster: groupe
+de points dense et distincts;</p>
+<p><strong>cassini</strong>, là encore, un jeu de donnée qui montre
+aussi beaucoup de séparation entre les différents clusters. La
+particularité de celui ci c’est que les groupes ne sont pas très denses
+et pas forcément circulaires.</p>
+<p><strong>3-spiral</strong>, un jeu de donnée pour lequel la notion de
+cluster est plus complexe à identifier. Un oeuil humain voudrait grouper
+chaque branche de la spirale mais elles ne correspond plus à un groupe
+dense de point.</p>
+<p><strong>birch-rg1</strong>, un jeu de donnée qui ne représente aucun
+cluster, par contre il comporte un grand nombre de point, ce qui
+permettra de comparer les vitesse d’exécution des trois algorithmes.</p>
+<h2 id="méthodes-dévaluation">Méthodes d’évaluation</h2>
+<p>Pour évaluer la qualité de nos clusterings avec la méthode k-means,
+nous disposons de 3 métriques d’évaluation :</p>
+<h3 id="critère-de-calinski-harabasz">Critère de Calinski-Harabasz</h3>
+<p>Ce critère est le ratio de la somme des dispersions entre les
+clusters et à l’intérieur des clusters et de la dispersion pour tous les
+clusters. On définit ici la dispersion comme la somme des distances au
+carré.</p>
+<p>Plus ce critère est élevé, plus les clusters évalués sont bien
+définis.</p>
+<h3 id="critère-de-davies-bouldin">Critère de Davies-Bouldin</h3>
+<p>Ce critère représente la similarité moyenne entre clusters, où la
+similarité est une mesure qui compare la distance entre clusters avec la
+taille des clusters eux-mêmes.</p>
+<p>Plus le score est bas, mieux les clusters sont séparés, le score
+minimum étant zéro.</p>
+<h3 id="silhouette-coefficient">Silhouette Coefficient</h3>
+<p>Ce coefficient est compris entre +1 et -1 et se situe près de zéro
+s’il y a de “l’overlap” de clusters en assumant une définition
+“classique” du cluster (groupe de points). Plus ce coefficient est
+élevé, mieux les clusters du modèle sont bien définis.</p>
+<p>Désavantages : Le coefficient de la silhouette is généralement plus
+élevé pour les clusters convexes que pour les autres concepts de
+clusters tels que les clusters basés sur la densité comme ceux obtenus
+via DBSCAN.</p>
+<h2 id="k-means">K-Means</h2>
+<p>L’application de l’algorithme K-Means permet de regrouper les points
+ensemble par proximité directe. On peut constater que pour le dataset
+xclara avec 3 cluster, le résultat est assez bluffant, les trois groupes
+sont bien identifiés !</p>
+<figure>
+<img src="k-means/xclara-k=3.png" alt="bon_exemple_k-means" />
+<figcaption aria-hidden="true">bon_exemple_k-means</figcaption>
+</figure>
+<p>Malheureusement cette méthode ne fonctionne pas correctement pour
+tous les datasets, par exemple avec le dataset cassini, qui comporte 3
+groupes mal identifiés :</p>
+<figure>
+<img src="k-means/cassini-k=3.png" alt="mauvais_exemple" />
+<figcaption aria-hidden="true">mauvais_exemple</figcaption>
+</figure>
+<p>Autre exemple de clusters mal identifiés pour 3-spiral :</p>
+<figure>
+<img src="k-means%2F3-spiral-k%3D3.png" alt="3-spiral-k=3.png" />
+<figcaption aria-hidden="true">3-spiral-k=3.png</figcaption>
+</figure>
+<p>Ci-dessous, voici une application de la méthode du “coude” pour les 3
+jeux de données que nous avons décidé d’utiliser.</p>
+<p><img src="k-means%2F3-spiral-score.png" alt="3-spiral-score.png" />
+<img src="k-means%2Fcassini-score.png" alt="cassini-score.png" /> <img
+src="k-means%2Fxclara-score.png" alt="xclara-score.png" /></p>
+<p>Nous avons également mesuré le temps de calcul pour chaque clustering
+:</p>
+<p><img src="k-means%2F3-spiral-compute-time.png"
+alt="3-spiral-compute-time.png" /> <img
+src="k-means%2Fcassini-compute-time.png"
+alt="cassini-compute-time.png" /> <img
+src="k-means%2Fxclara-compute-time.png"
+alt="xclara-compute-time.png" /></p>
+<h3 id="tableau-récapitulatif">Tableau récapitulatif</h3>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Jeu de données</th>
+<th style="text-align: left;">Nombre de clusters idéal</th>
+<th style="text-align: left;">Temps calcul associé (s)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">3-spiral</td>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">0.062</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">cassini</td>
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">0.058</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">xclara</td>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">0.052</td>
+</tr>
+</tbody>
+</table>
+<h3 id="limites-de-la-méthode-k-means">Limites de la méthode
+k-means</h3>
+<p>La méthode K-means se base sur la distance moyenne des point. Il
+s’avère être efficace pour les clusters “cirulaires” tels que xclara. On
+observe une limite pour</p>
+<h2 id="clustering-agglomératif">Clustering agglomératif</h2>
+<h3 id="intérêts-de-la-méthode">Intérêts de la méthode</h3>
+<p>Le clustering agglomératif consiste à regrouper les données en
+clusters en utilisant une stratégie hiérarchique. Les avantages de cette
+méthode sont sa capacité à générer des clusters de tailles et de formes
+variables. Cependant, il présente également des inconvénients tels que
+la sensibilité aux choix initiaux et la complexité de l’algorithme. De
+plus, la vitesse de calcul peut être un problème pour certains jeux de
+données volumineux.</p>
+<p>Pour étudier cette méthode, nous utilisons la méthode
+AgglomerativeClustering de la bibiothèque scikit-learn. Nous faisons
+varier le paramètre <em>distance_threshold</em> qui représente la
+distance à partir de laquelle différents clusters ne seront plus
+fusionnés</p>
+<p>Nous utilisons également le paramètre <em>linkage</em> qui va définir
+la méthode utiliser afin de calculer la distance entre les points. Nous
+pouvons utiliser les paramètres suivant :</p>
+<ul>
+<li><strong>ward</strong> : minimise la variance des clusters
+fusionnés</li>
+<li><strong>average</strong> : utilise la moyenne des distances de
+chaque observation de deux sets.</li>
+<li><strong>complete</strong> : utilise la distance maximum entre toutes
+les observations de deux sets.</li>
+<li><strong>single</strong> : utilise le minimum des distances entre
+toutes les observations de deux sets.</li>
+</ul>
+<p><img src="dbscan/cassini/0.2-1.png" /> <img
+src="dbscan/xclara/10-50.png" /> ### Limites de la méthode</p>
+<h1 id="partie-2---nouvelles-données">Partie 2 - Nouvelles données</h1>
+<p>Pour visualiser comment seraient classées de nouvelles données, nous
+avons labelisé les points de l’espace pour les visualiser. Les résultats
+peuvent être trouvés sur les fichiers
+<code>{méthode}/{modèle}-extra.png</code>.</p>
+<h2 id="k-means-1">K-Means</h2>
+<p>Pour K-Means on peut constater sur les différents modèles que la
+méthode groupe les nouveau points en fonction de la proximité avec les
+clusters existants. On comprend donc bien que la clusterisation de la
+spirale n’est pas possible avec cette méthode.</p>
+<p>Pour les jeux cassini et xclara le regroupement se fait assez bien.
+On constate magré tout que la séparation sur xclara n’est pas très
+claire au niveau du cluster en abs à droite. Cela peut être du à la
+densité du cluster qui est plus éloigné. <img
+src="k-means/xclara-extra.png" /></p>
+<p>Pour cassini on retrouve exactement le découpage du plan et on peut
+constater que le groupe de points central n’est pas bien identifié. <img
+src="k-means/cassini-extra.png" /></p>
+<p>Pour 3-spiral on constate là aussi que le découpage proposé n’est pas
+du tout en adéquation avec les points. Cette méthode ne peut donc pas
+s’appliquer <img src="k-means/3-spiral-extra.png" /></p>

@@ -1,7 +1,8 @@
- # Rapport TP Machine learning
- 
-*CHAUVET Louis*
-*GALLOO Augustin*
+ # Rapport TP Clustering - 5SIEC
+
+<p style="text-align: center">**CHAUVET Louis**</p>
+<p style="text-align: center">**GALLOO Augustin**</p>
+*Janvier 2023*
 
 
 ## Introduction
@@ -157,11 +158,11 @@ L'avantage de cette méthode est qu'il n'est pas nécessaire de spécifier le no
 
 On peut constater ici que les groupes sont très bien identifiés sur les trois modèles:
 
-![](db_scan/3-spiral/0.9-1.png)
+![](dbscan/3-spiral/0.9-1.png)
 
-![](db_scan/cassini/0.2-1.png)
+![](dbscan/cassini/0.2-1.png)
 
-![](db_scan/xclara/10-50.png)
+![](dbscan/xclara/10-50.png)
 
 ### Avantages
 
