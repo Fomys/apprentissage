@@ -14,12 +14,18 @@ print()
 warnings.filterwarnings("ignore")
 
 path = './clustering-benchmark/src/main/resources/datasets/artificial/'
+path2 = './dataset-rapport/'
 
 import scipy.cluster.hierarchy as shc
 
 def load_data(dataset: str) -> np.ndarray:
     databrut = arff.loadarff(open(path + dataset + ".arff", 'r'))
     return np.array([[x[0], x[1]] for x in databrut[0]])
+
+def load_data2(dataset : str) -> np.ndarray:
+    databrut = np.loadtxt(path2 + dataset + ".txt")
+    data = [[x[0],x[1]] for x in databrut]
+    return np.array([[f[0], f[1]] for f in data])
 
 
 def compute(dataset, datanp, eps, min_samples, trace_time=False):
@@ -74,9 +80,9 @@ def compute(dataset, datanp, eps, min_samples, trace_time=False):
     return davies_bouldin_score, calinski_harabasz_score, silhouette_score,
 
 
-def generate_plot(dataset, trace_time=False, max_clusters=10):
+def generate_plot(dataset, trace_time=False, max_clusters=20):
     begin_load_time = time()
-    datanp = load_data(dataset)
+    datanp = load_data2(dataset)
     end_load_time = time()
     if trace_time:
         print(f"Load time for {dataset}: {end_load_time - begin_load_time:.2}s")
@@ -137,7 +143,7 @@ def generate_plot(dataset, trace_time=False, max_clusters=10):
     plt.show()
 
 
-models = ["xclara", "cassini", "3-spiral", "golfball", "birch-rg1"]
+models = ["x1", "x2", "x3", "x4", "y1", "zz1", "zz2"]
 
 for dataset in models:
     generate_plot(dataset)
