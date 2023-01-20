@@ -64,7 +64,7 @@ def compute(dataset, datanp, k, trace_time=False):
     return davies_bouldin_score, calinski_harabasz_score, silhouette_score, end_fit_time - begin_fit_time
 
 
-def generate_plot(dataset, trace_time=False, max_clusters=20):
+def generate_plot(dataset, trace_time=False, max_clusters=3):
     begin_load_time = time()
     datanp = load_data2(dataset)
     end_load_time = time()
@@ -103,7 +103,7 @@ def generate_plot(dataset, trace_time=False, max_clusters=20):
     plt.show()
 
 
-models = ["x1", "x2", "x3", "x4"]
+models = ["y1"]
 
 for dataset in models:
     print(dataset)

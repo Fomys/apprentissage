@@ -7,7 +7,7 @@ from numpy import arange
 from scipy.io import arff
 from sklearn import cluster, metrics
 from time import time
-
+from sklearn.neighbors import NearestNeighbors
 from sklearn.cluster import DBSCAN
 
 print()
@@ -91,8 +91,9 @@ def generate_plot(dataset, trace_time=False, max_clusters=20):
     db_all = []
     ch_all = []
     s_all = []
-    x = arange(0.01, 0.21, 0.05)
-    y = arange(2, 102, 10)
+
+    y = [1,10,20,30,80,100,200,250,300,350]
+    x = [50000,65000]
     for eps in x:
         db = []
         ch = []
@@ -107,58 +108,31 @@ def generate_plot(dataset, trace_time=False, max_clusters=20):
         ch_all.append(ch)
         s_all.append(s)
 
-    fig, ax = plt.subplots()
-    im = plt.imshow(db_all, cmap='hot', interpolation='nearest')
-    cbar = ax.figure.colorbar(im, ax=ax)
-    cbar.ax.set_ylabel("Davies-Bouldin value", rotation=-90, va="bottom")
-    ax.set_xticks(x)
-    plt.xlabel("eps")
-    ax.set_yticks(y)
-    plt.ylabel("min_samples")
-    plt.savefig(f"db_scan/{dataset}-db-score.png")
+
+
+
+    # Distances k plus proches voisins
+    # Donnees dans X
+    k = 5
+    neigh = NearestNeighbors(n_neighbors=k)
+    neigh.fit(datanp)
+    distances, indices = neigh.kneighbors(datanp)
+    # retirer le point " origine "
+    newDistances = np.asarray([np.average(distances[i][1:]) for i in range(0, distances.shape[0])])
+    trie = np.sort(newDistances)
+    plt.title(dataset + ": Moyenne de la distance aux 5 plus proches voisins")
+    plt.plot(trie);
+    plt.savefig(f"db_scan/{dataset}-db-nearest.png")
     plt.show()
 
 
-    fig, ax = plt.subplots()
-    im = plt.imshow(ch_all, cmap='hot', interpolation='nearest')
-    cbar = ax.figure.colorbar(im, ax=ax)
-    cbar.ax.set_ylabel("Calinski-Harabasz value", rotation=-90, va="bottom")
-    ax.set_xticks(x)
-    plt.xlabel("eps")
-    ax.set_yticks(y)
-    plt.ylabel("min_samples")
-    plt.savefig(f"db_scan/{dataset}-ch-score.png")
-    plt.show()
 
 
-    fig, ax = plt.subplots()
-    im = plt.imshow(ch_all, cmap='hot', interpolation='nearest')
-    cbar = ax.figure.colorbar(im, ax=ax)
-    cbar.ax.set_ylabel("Calinski-Harabasz value", rotation=-90, va="bottom")
-    ax.set_xticks(x)
-    plt.xlabel("eps")
-    ax.set_yticks(y)
-    plt.ylabel("min_samples")
-    plt.savefig(f"db_scan/{dataset}-s-score.png")
-    plt.show()
 
-
-models = ["x1", "x2", "x3", "x4", "y1", "zz1", "zz2"]
+models = ["zz1","zz2"]
 
 for dataset in models:
     generate_plot(dataset)
 
 
-# # Distances k plus proches voisins
-# # Donnees dans X
-# k = 5
-# neigh = NearestNeighbors ( n_neighbors = k )
-# neigh . fit ( X )
-# distances , indices = neigh . kneighbors ( X )
-# # retirer le point " origine "
-# newDistances = np . asarray ( [ np . average ( distances [ i ] [ 1 : ] ) for i in range (0 ,
-# distances . shape [ 0 ] ) ] )
-# trie = np . sort ( newDistances )
-# plt . title ( " Plus proches voisins ( 5 ) " )
-# plt . plot ( trie ) ;
-# plt . show ()
+

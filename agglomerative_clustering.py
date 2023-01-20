@@ -102,28 +102,28 @@ def compute(dataset, datanp, linkage, k, distance_threshold=None, trace_time=Fal
     os.makedirs(f"agglomerative_clustering/{dataset}", exist_ok=True)
     if distance_threshold:
         plt.title(f"{dataset}: agglomerative clustering with distance threshold={distance_threshold}")
-        plt.savefig(f"agglomerative_clustering/{dataset}/{linkage}-{distance_threshold}.png")
+        plt.savefig(f"agglomerative_clustering/{dataset}-{linkage}-{distance_threshold}.png")
     else:
         plt.title(f"{dataset}: agglomerative clustering with cluster count={k}")
-        plt.savefig(f"agglomerative_clustering/{dataset}/{linkage}-k={k}.png")
+        plt.savefig(f"agglomerative_clustering/{dataset}-{linkage}-k={k}.png")
     plt.clf()
 
     return davies_bouldin_score, calinski_harabasz_score, silhouette_score
 
 
-def generate_plot(dataset, trace_time=False, max_clusters=20):
+def generate_plot(dataset, trace_time=False, max_clusters=16):
     begin_load_time = time()
     datanp = load_data2(dataset)
     end_load_time = time()
     if trace_time:
         print(f"Load time for {dataset}: {end_load_time - begin_load_time:.2}s")
 
-    cluster_count = list(range(2, max_clusters))
+    cluster_count = list(range(15, max_clusters))
     db_all = []
     ch_all = []
     s_all = []
-    for linkage in ('ward', 'complete', 'average'):
-        for distance_threshold in (None, 100e3, 250e3, 500e3):
+    for linkage in ('average',):
+        for distance_threshold in (None, 25e3):
             db = []
             ch = []
             s = []
@@ -153,7 +153,7 @@ def generate_plot(dataset, trace_time=False, max_clusters=20):
 
 
 
-models = ["x1", "x2", "x3", "x4"]
+models = [ "x4"]
 #"xclara" , "3-spiral", "golfball"]
 
 for dataset in models:
